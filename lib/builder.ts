@@ -37,6 +37,7 @@ export class Builder {
   }
 
   public build(): void {
+    let exec = this.webpackBinPath;
     const args = [
       "--config",
       this.options.config,
@@ -48,7 +49,12 @@ export class Builder {
       this.options.output,
     ].filter(Boolean) as string[];
 
-    const results = spawnSync(this.webpackBinPath, args);
+    if (process.platform === 'win32') {
+      args.unshift(this.webpackBinPath);
+      exec = 'node';
+    }
+
+    const results = spawnSync(exec, args);
 
     if (results.error) {
       throw results.error;
